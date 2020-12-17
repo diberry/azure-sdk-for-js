@@ -1771,7 +1771,9 @@ export class BlobClient extends StorageClient {
    *
    * @param {BlobHTTPHeaders} [blobHTTPHeaders] If no value provided, or no value provided for
    *                                                   the specified blob HTTP headers, these blob HTTP
-   *                                                   headers without a value will be cleared.
+   *                                                   headers without a value will be cleared. 
+   *                                                   A common header to set is `blobContentType`, *                                                   enabling the browser to provide functionality 
+   *                                                   based on file type.
    * @param {BlobSetHTTPHeadersOptions} [options] Optional options to Blob Set HTTP Headers operation.
    * @returns {Promise<BlobSetHTTPHeadersResponse>}
    * @memberof BlobClient
@@ -2587,6 +2589,8 @@ export interface AppendBlobCreateOptions extends CommonOptions {
   blobHTTPHeaders?: BlobHTTPHeaders;
   /**
    * A collection of key-value string pair to associate with the blob when creating append blobs.
+   * A common header to set is `blobContentType`, enabling the browser to provide functionality
+   * based on file type.
    *
    * @type {Metadata}
    * @memberof AppendBlobCreateOptions
@@ -2642,6 +2646,8 @@ export interface AppendBlobCreateIfNotExistsOptions extends CommonOptions {
   blobHTTPHeaders?: BlobHTTPHeaders;
   /**
    * A collection of key-value string pair to associate with the blob when creating append blobs.
+   * A common header to set is `blobContentType`, enabling the browser to provide functionality
+   * based on file type.
    *
    * @type {Metadata}
    * @memberof AppendBlobCreateIfNotExistsOptions
@@ -3317,7 +3323,9 @@ export interface BlockBlobUploadOptions extends CommonOptions {
   blobHTTPHeaders?: BlobHTTPHeaders;
   /**
    * A collection of key-value string pair to associate with the blob when uploading to a block blob.
-   *
+   * A common header to set is `blobContentType`, enabling the browser to provide functionality
+   * based on file type.
+   * 
    * @type {Metadata}
    * @memberof BlockBlobUploadOptions
    */
@@ -3445,7 +3453,9 @@ export interface BlockBlobSyncUploadFromURLOptions extends CommonOptions {
   blobHTTPHeaders?: BlobHTTPHeaders;
   /**
    * Conditions to meet for the destination Azure Blob.
-   *
+   * A common header to set is `blobContentType`, enabling the browser to provide functionality
+   * based on file type.
+   * 
    * @type {BlobRequestConditions}
    * @memberof BlockBlobSyncUploadFromURLOptions
    */
@@ -3834,7 +3844,9 @@ export interface BlockBlobCommitBlockListOptions extends CommonOptions {
   blobHTTPHeaders?: BlobHTTPHeaders;
   /**
    * A collection of key-value string pair to associate with the blob when committing block list.
-   *
+   * A common header to set is `blobContentType`, enabling the browser to provide functionality
+   * based on file type.
+   * 
    * @type {Metadata}
    * @memberof BlockBlobCommitBlockListOptions
    */
@@ -3916,7 +3928,9 @@ export interface BlockBlobUploadStreamOptions extends CommonOptions {
   abortSignal?: AbortSignalLike;
 
   /**
-   * Blob HTTP Headers.
+   * Blob HTTP Headers. 
+   * A common header to set is `blobContentType`, 
+   * enabling the browser to provide functionality based on file type.
    *
    * @type {BlobHTTPHeaders}
    * @memberof BlockBlobUploadStreamOptions
@@ -4020,6 +4034,8 @@ export interface BlockBlobParallelUploadOptions extends CommonOptions {
 
   /**
    * Blob HTTP Headers.
+   * A common header to set is `blobContentType`,
+   * enabling the browser to provide functionality based on file type.
    *
    * @type {BlobHTTPHeaders}
    * @memberof BlockBlobParallelUploadOptions
@@ -4342,24 +4358,24 @@ export class BlockBlobClient extends BlobClient {
         queryRequest: {
           expression: query,
           inputSerialization: toQuerySerialization(options.inputTextConfiguration),
-          outputSerialization: toQuerySerialization(options.outputTextConfiguration)
+          outputSerialization: toQuerySerialization(options.outputTextConfiguration),
         },
         leaseAccessConditions: options.conditions,
         modifiedAccessConditions: {
           ...options.conditions,
-          ifTags: options.conditions?.tagConditions
+          ifTags: options.conditions?.tagConditions,
         },
-        spanOptions
+        spanOptions,
       });
       return new BlobQueryResponse(response, {
         abortSignal: options.abortSignal,
         onProgress: options.onProgress,
-        onError: options.onError
+        onError: options.onError,
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4411,19 +4427,19 @@ export class BlockBlobClient extends BlobClient {
         metadata: options.metadata,
         modifiedAccessConditions: {
           ...options.conditions,
-          ifTags: options.conditions?.tagConditions
+          ifTags: options.conditions?.tagConditions,
         },
         onUploadProgress: options.onProgress,
         cpkInfo: options.customerProvidedKey,
         encryptionScope: options.encryptionScope,
         tier: toAccessTier(options.tier),
         blobTagsString: toBlobTagsString(options.tags),
-        spanOptions
+        spanOptions,
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4468,24 +4484,24 @@ export class BlockBlobClient extends BlobClient {
         leaseAccessConditions: options.conditions,
         modifiedAccessConditions: {
           ...options.conditions,
-          ifTags: options.conditions.tagConditions
+          ifTags: options.conditions.tagConditions,
         },
         sourceModifiedAccessConditions: {
           sourceIfMatch: options.sourceConditions?.ifMatch,
           sourceIfModifiedSince: options.sourceConditions?.ifModifiedSince,
           sourceIfNoneMatch: options.sourceConditions?.ifNoneMatch,
           sourceIfUnmodifiedSince: options.sourceConditions?.ifUnmodifiedSince,
-          sourceIfTags: options.sourceConditions?.tagConditions
+          sourceIfTags: options.sourceConditions?.tagConditions,
         },
         cpkInfo: options.customerProvidedKey,
         tier: toAccessTier(options.tier),
         blobTagsString: toBlobTagsString(options.tags),
-        spanOptions
+        spanOptions,
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4522,12 +4538,12 @@ export class BlockBlobClient extends BlobClient {
         transactionalContentCrc64: options.transactionalContentCrc64,
         cpkInfo: options.customerProvidedKey,
         encryptionScope: options.encryptionScope,
-        spanOptions
+        spanOptions,
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4578,12 +4594,12 @@ export class BlockBlobClient extends BlobClient {
         sourceRange: offset === 0 && !count ? undefined : rangeToString({ offset, count }),
         cpkInfo: options.customerProvidedKey,
         encryptionScope: options.encryptionScope,
-        spanOptions
+        spanOptions,
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4624,19 +4640,19 @@ export class BlockBlobClient extends BlobClient {
           metadata: options.metadata,
           modifiedAccessConditions: {
             ...options.conditions,
-            ifTags: options.conditions?.tagConditions
+            ifTags: options.conditions?.tagConditions,
           },
           cpkInfo: options.customerProvidedKey,
           encryptionScope: options.encryptionScope,
           tier: toAccessTier(options.tier),
           blobTagsString: toBlobTagsString(options.tags),
-          spanOptions
+          spanOptions,
         }
       );
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4669,9 +4685,9 @@ export class BlockBlobClient extends BlobClient {
         leaseAccessConditions: options.conditions,
         modifiedAccessConditions: {
           ...options.conditions,
-          ifTags: options.conditions?.tagConditions
+          ifTags: options.conditions?.tagConditions,
         },
-        spanOptions
+        spanOptions,
       });
 
       if (!res.committedBlocks) {
@@ -4686,7 +4702,7 @@ export class BlockBlobClient extends BlobClient {
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4703,6 +4719,10 @@ export class BlockBlobClient extends BlobClient {
    * {@link BLOCK_BLOB_MAX_UPLOAD_BLOB_BYTES}), this method will use 1 {@link upload} call to finish the upload.
    * Otherwise, this method will call {@link stageBlock} to upload blocks, and finally call {@link commitBlockList}
    * to commit the block list.
+   *
+   * A common {@link BlockBlobParallelUploadOptions.blobHTTPHeaders} option to set is
+   * `blobContentType`, enabling the browser to provide
+   * functionality based on file type.
    *
    * @export
    * @param {Buffer | Blob | ArrayBuffer | ArrayBufferView} data Buffer(Node.js), Blob, ArrayBuffer or ArrayBufferView
@@ -4732,7 +4752,7 @@ export class BlockBlobClient extends BlobClient {
           buffer.byteLength,
           {
             ...options,
-            tracingOptions: { ...options!.tracingOptions, spanOptions }
+            tracingOptions: { ...options!.tracingOptions, spanOptions },
           }
         );
       } else {
@@ -4746,7 +4766,7 @@ export class BlockBlobClient extends BlobClient {
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4762,6 +4782,10 @@ export class BlockBlobClient extends BlobClient {
    * When buffer length <= 256MB, this method will use 1 upload call to finish the upload.
    * Otherwise, this method will call {@link stageBlock} to upload blocks, and finally call
    * {@link commitBlockList} to commit the block list.
+   *
+   * A common {@link BlockBlobParallelUploadOptions.blobHTTPHeaders} option to set is
+   * `blobContentType`, enabling the browser to provide
+   * functionality based on file type.
    *
    * @deprecated Use {@link uploadData} instead.
    *
@@ -4789,7 +4813,7 @@ export class BlockBlobClient extends BlobClient {
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4866,7 +4890,7 @@ export class BlockBlobClient extends BlobClient {
       if (size <= options.maxSingleShotSize) {
         return await this.upload(bodyFactory(0, size), size, {
           ...options,
-          tracingOptions: { ...options!.tracingOptions, spanOptions }
+          tracingOptions: { ...options!.tracingOptions, spanOptions },
         });
       }
 
@@ -4895,14 +4919,14 @@ export class BlockBlobClient extends BlobClient {
               abortSignal: options.abortSignal,
               conditions: options.conditions,
               encryptionScope: options.encryptionScope,
-              tracingOptions: { ...options!.tracingOptions, spanOptions }
+              tracingOptions: { ...options!.tracingOptions, spanOptions },
             });
             // Update progress after block is successfully uploaded to server, in case of block trying
             // TODO: Hook with convenience layer progress event in finer level
             transferProgress += contentLength;
             if (options.onProgress) {
               options.onProgress!({
-                loadedBytes: transferProgress
+                loadedBytes: transferProgress,
               });
             }
           }
@@ -4912,12 +4936,12 @@ export class BlockBlobClient extends BlobClient {
 
       return this.commitBlockList(blockList, {
         ...options,
-        tracingOptions: { ...options!.tracingOptions, spanOptions }
+        tracingOptions: { ...options!.tracingOptions, spanOptions },
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -4952,7 +4976,7 @@ export class BlockBlobClient extends BlobClient {
             fsCreateReadStream(filePath, {
               autoClose: true,
               end: count ? offset + count - 1 : Infinity,
-              start: offset
+              start: offset,
             });
         },
         size,
@@ -4961,7 +4985,7 @@ export class BlockBlobClient extends BlobClient {
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -5022,7 +5046,7 @@ export class BlockBlobClient extends BlobClient {
           await this.stageBlock(blockID, body, length, {
             conditions: options.conditions,
             encryptionScope: options.encryptionScope,
-            tracingOptions: { ...options!.tracingOptions, spanOptions }
+            tracingOptions: { ...options!.tracingOptions, spanOptions },
           });
 
           // Update progress after block is successfully uploaded to server, in case of block trying
@@ -5041,12 +5065,12 @@ export class BlockBlobClient extends BlobClient {
 
       return await this.commitBlockList(blockList, {
         ...options,
-        tracingOptions: { ...options!.tracingOptions, spanOptions }
+        tracingOptions: { ...options!.tracingOptions, spanOptions },
       });
     } catch (e) {
       span.setStatus({
         code: CanonicalCode.UNKNOWN,
-        message: e.message
+        message: e.message,
       });
       throw e;
     } finally {
@@ -5086,7 +5110,8 @@ export interface PageBlobCreateOptions extends CommonOptions {
    */
   blobSequenceNumber?: number;
   /**
-   * HTTP headers to set when creating a page blob.
+   * HTTP headers to set when creating a page blob. A common header to set is `blobContentType`,
+   * enabling the browser to provide functionality based on file type.
    *
    * @type {BlobHTTPHeaders}
    * @memberof PageBlobCreateOptions
@@ -5157,7 +5182,8 @@ export interface PageBlobCreateIfNotExistsOptions extends CommonOptions {
    */
   blobSequenceNumber?: number;
   /**
-   * HTTP headers to set when creating a page blob.
+   * HTTP headers to set when creating a page blob. A common header to set is `blobContentType`,
+   * enabling the browser to provide functionality based on file type.
    *
    * @type {BlobHTTPHeaders}
    * @memberof PageBlobCreateIfNotExistsOptions
@@ -7931,6 +7957,9 @@ export class ContainerClient extends StorageClient {
    * overwritten with the new content. To perform a partial update of a block blob's,
    * use {@link BlockBlobClient.stageBlock} and {@link BlockBlobClient.commitBlockList}.
    *
+   * Use {@link BlockBlobUploadOptions} to set the content type. 
+   * For example `const options = { blobHTTPHeaders: { blobContentType: file.type } };`
+   * 
    * This is a non-parallel uploading method, please use {@link BlockBlobClient.uploadFile},
    * {@link BlockBlobClient.uploadStream} or {@link BlockBlobClient.uploadBrowserData} for better
    * performance with concurrency uploading.
